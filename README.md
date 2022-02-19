@@ -607,6 +607,3 @@ If you use this code in your research, you can cite our [arxiv paper](https://ar
     booktitle={ACL, system demonstration}
 }
 ```
-
-
-

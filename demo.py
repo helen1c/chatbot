@@ -109,7 +109,7 @@ args = [
     '--valid_step', '5000',
     '--warmup_steps', '4000',
     '--normalize_data', 'true',
-    '--fp16', 'true',
+    '--fp16', 'false',
     '--lr_schedule', 'noam',
     '--loss_scale', '0.0',
     '--no_token_id', 'true',

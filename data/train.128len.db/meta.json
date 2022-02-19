@@ -1,0 +1,7 @@
+{
+    "n_example": 10000,
+    "chunk_size": 65536,
+    "max_seq_len": 128,
+    "reverse": false,
+    "two_turn": false
+}

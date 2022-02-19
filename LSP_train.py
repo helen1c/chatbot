@@ -5,6 +5,8 @@
           Modified based on Huggingface GPT-2 implementation
 '''
 
+import os
+import torch
 import json
 import os
 import sys
@@ -13,7 +15,6 @@ import logging
 import time
 import tqdm
 import datetime
-import torch
 
 import numpy as np
 
@@ -29,6 +30,7 @@ from data_loader import BucketingDataLoader, DynamicBatchingLoader, DistributedB
 
 from gpt2_training.distributed import all_reduce_and_rescale_tensors, all_gather_list
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -71,7 +73,7 @@ parser.add_argument("--warmup_proportion", type=float, default=0.1)
 parser.add_argument("--warmup_steps", type=int, default=16000)
 
 parser.add_argument("--normalize_data", type=boolean_string, default=True)
-parser.add_argument("--fp16", type=boolean_string, default=True)
+parser.add_argument("--fp16", type=boolean_string, default=False)
 parser.add_argument("--lr_schedule", type=str,
                     choices=['noam', 'noamwd', 'BERT', 'None'], default='noam')
 parser.add_argument("--loss_scale", type=float, default=0)
