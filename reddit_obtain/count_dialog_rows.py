@@ -1,6 +1,6 @@
 import os
 
-DIALOGS_PATH = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/dialogs"
+DIALOGS_PATH = "/home/rcala/chatbot/reddit_obtain/Reddit/dialogs"
 
 dataset_paths = []
 for (dirpath, dirnames, filenames) in os.walk(DIALOGS_PATH):

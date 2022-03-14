@@ -8,7 +8,7 @@ def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
     def run_retrieve():
         subprocess.run(
             [
-                "/Users/arvencala/miniconda3/bin/python",
+                "/home/rcala/.conda/envs/LSP/bin/python",
                 "dialog_retrieval.py",
                 "--reddit_id",
                 reddit_id,
@@ -23,9 +23,9 @@ def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
 
 
 BOTS_CONFIG_PATH = (
-    "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/bots_config.json"
+    "/home/rcala/chatbot/reddit_obtain/Reddit/bots_config.json"
 )
-ERROR_FILE_TEMPLATE = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/error_logs/process_{}_error_log.txt"
+ERROR_FILE_TEMPLATE = "/home/rcala/chatbot/reddit_obtain/Reddit/error_logs/process_{}_error_log.txt"
 
 bots_file = open(BOTS_CONFIG_PATH, "r")
 bots_config = json.load(bots_file)

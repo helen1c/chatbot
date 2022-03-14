@@ -11,10 +11,10 @@ import random
 from random import randrange
 
 SUBREDDITS_PATH = (
-    "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/reddit_subreddits.txt"
+    "/home/rcala/chatbot/reddit_obtain/Reddit/reddit_subreddits.txt"
 )
 NSFW_SUBREDDITS_PATH = (
-    "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/nsfw_reddit_subreddits.txt"
+    "/home/rcala/chatbot/reddit_obtain/Reddit/nsfw_reddit_subreddits.txt"
 )
 DAILY_SECONDS = 86400
 FIRST_EPOCH_TIMESTAMP_2018 = 1514764800
@@ -44,19 +44,19 @@ try:
 
     random.seed(int(args.process_id))
 
-    already_chosen_json_path = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/already_processed/already_processed_process_{}.json".format(
+    already_chosen_json_path = "/home/rcala/chatbot/reddit_obtain/Reddit/already_processed/already_processed_process_{}.json".format(
         args.process_id
     )
 
-    dialog_output_path = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/dialogs/reddit_dialogs_process_{}.tsv".format(
+    dialog_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/dialogs/reddit_dialogs_process_{}.tsv".format(
         args.process_id
     )
 
-    error_output_path = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/error_logs/process_{}_error_log.txt".format(
+    error_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/error_logs/process_{}_error_log.txt".format(
         args.process_id
     )
 
-    logs_output_path = "/Users/arvencala/Desktop/Faculty/Rektor/Datasets/Reddit/logs/process_{}_log.txt".format(
+    logs_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/logs/process_{}_log.txt".format(
         args.process_id
     )
 
