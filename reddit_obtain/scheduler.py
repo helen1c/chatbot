@@ -4,9 +4,6 @@ import json
 import time
 from threading import Thread
 
-MAX_NODES = 10
-
-
 def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
     def run_retrieve():
         subprocess.run(
@@ -36,8 +33,6 @@ bots_config = json.load(bots_file)
 bot_threads = []
 
 for bot_id in bots_config.keys():
-    if int(bot_id) > MAX_NODES:
-        continue
     time.sleep(5)
     empty_file = open(ERROR_FILE_TEMPLATE.format(bot_id), "w")
     empty_file.close()
@@ -55,8 +50,6 @@ for bot_id in bots_config.keys():
 while True:
 
     for bot_id in bots_config.keys():
-        if int(bot_id) > MAX_NODES:
-            continue
         time.sleep(2)
         error_file = open(ERROR_FILE_TEMPLATE.format(bot_id), "r")
         lines = error_file.readlines()

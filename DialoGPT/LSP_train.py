@@ -90,7 +90,7 @@ parser.add_argument('--config', help='JSON config file')
 
 
 # do normal parsing
-args = parser.parse_args("--model_name_or_path /home/rcala/DialoGPT/models/small --init_checkpoint /home/rcala/DialoGPT/models/small/pytorch_model.bin --train_input_file /home/rcala/DialoGPT/data/train.128len.db --eval_input_file ./data/dummy_data.tsv --output_dir /home/rcala/DialoGPT/models/output_model --seed 42 --max_seq_length 128 --train_batch_size 512 --gradient_accumulation_steps 8 --eval_batch_size 64 --learning_rate 1e-5 --num_optim_steps 10000 --valid_step 5000 --warmup_steps 4000 --normalize_data true --fp16 false --lr_schedule noam --loss_scale 0.0 --no_token_id true --pbar true".split())
+args = parser.parse_args("--model_name_or_path /home/rcala/chatbot/DialoGPT/models/small --init_checkpoint /home/rcala/chatbot/DialoGPT/models/small/pytorch_model.bin --train_input_file /home/rcala/chatbot/DialoGPT/data/train.128len.db --eval_input_file ./data/dummy_data.tsv --output_dir /home/rcala/chatbot/DialoGPT/models/output_model --seed 42 --max_seq_length 128 --train_batch_size 8 --gradient_accumulation_steps 1 --eval_batch_size 16 --learning_rate 1e-5 --num_optim_steps 10000 --valid_step 5000 --warmup_steps 4000 --normalize_data true --fp16 false --lr_schedule noam --loss_scale 0.0 --no_token_id true --pbar true".split())
 
 if args.config is not None:
     # override argparse defaults by config JSON
