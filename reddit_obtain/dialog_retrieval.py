@@ -16,6 +16,9 @@ SUBREDDITS_PATH = (
 NSFW_SUBREDDITS_PATH = (
     "/home/rcala/chatbot/reddit_obtain/Reddit/nsfw_reddit_subreddits.txt"
 )
+
+USER_AGENTS_PATH = "/home/rcala/chatbot/reddit_obtain/Reddit/user_agent_texts.txt"
+
 DAILY_SECONDS = 86400
 FIRST_EPOCH_TIMESTAMP_2018 = 1514764800
 LAST_EPOCH_TIMESTAMP_2022 = 1646870400
@@ -23,13 +26,14 @@ REDDIT_NAME = "narval13068"
 REDDIT_PASSWORD = "redditsifra123"
 SECONDS_IN_HOUR = 3600
 SUBMISSION_REDDIT_API_TEMP = "http://api.pushshift.io/reddit/search/submission/?subreddit={}&sort=asc&sort_type=created_utc&after={}&before={}"
+NUM_BOTS = 350
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--reddit_id", type=str, required=True)
 parser.add_argument("--reddit_secret", type=str, required=True)
 parser.add_argument(
-    "--user_agent", type=str, default="reddit_extracting_dialog_data_agent_1"
+    "--user_agent", type=str, default="a reddit agent for extracting conversations "
 )
 parser.add_argument("--process_id", type=int, required=True)
 parser.add_argument("--window_days", type=int, default=1)
@@ -69,15 +73,25 @@ try:
     logger = logging.getLogger(__name__)
 
     epoch_step = DAILY_SECONDS * args.window_days
-
     checkpoint_time = time.time()
+
     if os.path.exists(already_chosen_json_path) is False:
         config_file = open(already_chosen_json_path, "w")
         config_file.write("{}")
         config_file.close()
     already_processed = json.load(open(already_chosen_json_path, "r"))
+    
     first = True
+
+    user_agents = open(USER_AGENTS_PATH, "r").read().split("\n")
+
     subreddits = open(SUBREDDITS_PATH, "r").read().split("\n")
+    orig_num_subreddits = len(subreddits)
+    subreddits = subreddits[
+        int((int(args.process_id)-1)*orig_num_subreddits/NUM_BOTS):
+        int(int(args.process_id)*orig_num_subreddits/NUM_BOTS)
+    ]
+
     nsfw_subreddits = open(NSFW_SUBREDDITS_PATH, "r").read().split("\n")
     filtered_subreddits = []
     for subreddit in subreddits:
@@ -88,6 +102,8 @@ try:
 
     logger.info("START")
 
+    tryed=0
+
     while True:
 
         if time.time() - checkpoint_time >= SECONDS_IN_HOUR or first:
@@ -97,16 +113,18 @@ try:
             reddit = praw.Reddit(
                 client_id=args.reddit_id,
                 client_secret=args.reddit_secret,
-                user_agent=args.user_agent,
+                user_agent=user_agents[int(args.process_id)-1],
             )
-            auth = requests.auth.HTTPBasicAuth(args.reddit_id, args.reddit_secret)
 
+
+            auth = requests.auth.HTTPBasicAuth(args.reddit_id, args.reddit_secret)
             data = {
                 "grant_type": "password",
                 "username": REDDIT_NAME,
                 "password": REDDIT_PASSWORD,
             }
-            headers = {"User-Agent": "Reddit dialog model"}
+            headers = {"User-Agent": user_agents[int(args.process_id)-1]}
+
             res = requests.post(
                 "https://www.reddit.com/api/v1/access_token",
                 auth=auth,
@@ -129,7 +147,13 @@ try:
         already_processed_key = subreddit_name + "-" + str(created_utc_after)
 
         if already_processed_key in already_processed:
+            tryed += 1
+            if tryed==10000:
+                time.sleep(10)
+                tryed=0
             continue
+
+        tryed=0
 
         time.sleep(2)
 
@@ -141,7 +165,11 @@ try:
 
         logger.info(request_url)
 
-        res = requests.get(request_url, headers=headers)
+        try:
+            res = requests.get(request_url, headers=headers)
+        except Exception as e:
+            logger.info(str(e))
+            continue
 
         logger.info(res)
 

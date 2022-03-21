@@ -1,4 +1,3 @@
-from re import T
 import subprocess
 import json
 import time
@@ -9,7 +8,7 @@ def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
         subprocess.run(
             [
                 "/home/rcala/.conda/envs/LSP/bin/python",
-                "dialog_retrieval.py",
+                "/home/rcala/chatbot/reddit_obtain/dialog_retrieval.py",
                 "--reddit_id",
                 reddit_id,
                 "--reddit_secret",
@@ -33,7 +32,7 @@ bots_config = json.load(bots_file)
 bot_threads = []
 
 for bot_id in bots_config.keys():
-    time.sleep(5)
+    time.sleep(2)
     empty_file = open(ERROR_FILE_TEMPLATE.format(bot_id), "w")
     empty_file.close()
     bot_threads += [
@@ -49,8 +48,11 @@ for bot_id in bots_config.keys():
 
 while True:
 
+    bots_file = open(BOTS_CONFIG_PATH, "r")
+    bots_config = json.load(bots_file)
+
     for bot_id in bots_config.keys():
-        time.sleep(2)
+        time.sleep(1)
         error_file = open(ERROR_FILE_TEMPLATE.format(bot_id), "r")
         lines = error_file.readlines()
         error_file.close()
