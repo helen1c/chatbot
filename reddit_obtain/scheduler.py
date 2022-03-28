@@ -3,11 +3,12 @@ import json
 import time
 from threading import Thread
 
+
 def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
     def run_retrieve():
         subprocess.run(
             [
-                "/home/rcala/.conda/envs/LSP/bin/python",
+                "/home/rcala/miniconda3/envs/reddit_obtain/bin/python",
                 "/home/rcala/chatbot/reddit_obtain/dialog_retrieval.py",
                 "--reddit_id",
                 reddit_id,
@@ -21,10 +22,8 @@ def run_dialog_retrieval(reddit_id, reddit_secret, process_id):
     return run_retrieve
 
 
-BOTS_CONFIG_PATH = (
-    "/home/rcala/chatbot/reddit_obtain/Reddit/bots_config.json"
-)
-ERROR_FILE_TEMPLATE = "/home/rcala/chatbot/reddit_obtain/Reddit/error_logs/process_{}_error_log.txt"
+BOTS_CONFIG_PATH = "/storage/rcala/Reddit/bots_config.json"
+ERROR_FILE_TEMPLATE = "/storage/rcala/Reddit/error_logs/process_{}_error_log.txt"
 
 bots_file = open(BOTS_CONFIG_PATH, "r")
 bots_config = json.load(bots_file)
@@ -67,4 +66,3 @@ while True:
                 )
             )
             bot_threads[int(bot_id) - 1].start()
-

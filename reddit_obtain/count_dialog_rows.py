@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 
-DIALOGS_PATH = "/home/rcala/chatbot/reddit_obtain/Reddit/dialogs"
+DIALOGS_PATH = "/storage/rcala/Reddit/dialogs"
 
 dataset_paths = []
 for (dirpath, dirnames, filenames) in os.walk(DIALOGS_PATH):
@@ -16,7 +16,7 @@ for dataset_path in dataset_paths:
         num_read_file = len(read_file.readlines())
         num_dialogs += num_read_file
         num_dialogs_file[dataset_path] = num_read_file
-        print(dataset_path+" "+str(num_dialogs_file[dataset_path]))
+        print(dataset_path + " " + str(num_dialogs_file[dataset_path]))
 
 
 print("Num dialogs: {}".format(num_dialogs))

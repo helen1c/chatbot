@@ -10,14 +10,10 @@ from praw.models import MoreComments
 import random
 from random import randrange
 
-SUBREDDITS_PATH = (
-    "/home/rcala/chatbot/reddit_obtain/Reddit/reddit_subreddits.txt"
-)
-NSFW_SUBREDDITS_PATH = (
-    "/home/rcala/chatbot/reddit_obtain/Reddit/nsfw_reddit_subreddits.txt"
-)
+SUBREDDITS_PATH = "/storage/rcala/Reddit/reddit_subreddits.txt"
+NSFW_SUBREDDITS_PATH = "/storage/rcala/Reddit/nsfw_reddit_subreddits.txt"
 
-USER_AGENTS_PATH = "/home/rcala/chatbot/reddit_obtain/Reddit/user_agent_texts.txt"
+USER_AGENTS_PATH = "/storage/rcala/Reddit/user_agent_texts.txt"
 
 DAILY_SECONDS = 86400
 FIRST_EPOCH_TIMESTAMP_2018 = 1514764800
@@ -48,19 +44,23 @@ try:
 
     random.seed(int(args.process_id))
 
-    already_chosen_json_path = "/home/rcala/chatbot/reddit_obtain/Reddit/already_processed/already_processed_process_{}.json".format(
+    already_chosen_json_path = "/storage/rcala/Reddit/already_processed/already_processed_process_{}.json".format(
         args.process_id
     )
 
-    dialog_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/dialogs/reddit_dialogs_process_{}.tsv".format(
-        args.process_id
+    dialog_output_path = (
+        "/storage/rcala/Reddit/dialogs/reddit_dialogs_process_{}.tsv".format(
+            args.process_id
+        )
     )
 
-    error_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/error_logs/process_{}_error_log.txt".format(
-        args.process_id
+    error_output_path = (
+        "/storage/rcala/Reddit/error_logs/process_{}_error_log.txt".format(
+            args.process_id
+        )
     )
 
-    logs_output_path = "/home/rcala/chatbot/reddit_obtain/Reddit/logs/process_{}_log.txt".format(
+    logs_output_path = "/storage/rcala/Reddit/logs/process_{}_log.txt".format(
         args.process_id
     )
 
@@ -80,7 +80,7 @@ try:
         config_file.write("{}")
         config_file.close()
     already_processed = json.load(open(already_chosen_json_path, "r"))
-    
+
     first = True
 
     user_agents = open(USER_AGENTS_PATH, "r").read().split("\n")
@@ -88,8 +88,9 @@ try:
     subreddits = open(SUBREDDITS_PATH, "r").read().split("\n")
     orig_num_subreddits = len(subreddits)
     subreddits = subreddits[
-        int((int(args.process_id)-1)*orig_num_subreddits/NUM_BOTS):
-        int(int(args.process_id)*orig_num_subreddits/NUM_BOTS)
+        int((int(args.process_id) - 1) * orig_num_subreddits / NUM_BOTS) : int(
+            int(args.process_id) * orig_num_subreddits / NUM_BOTS
+        )
     ]
 
     nsfw_subreddits = open(NSFW_SUBREDDITS_PATH, "r").read().split("\n")
@@ -102,7 +103,7 @@ try:
 
     logger.info("START")
 
-    tryed=0
+    tryed = 0
 
     while True:
 
@@ -113,9 +114,8 @@ try:
             reddit = praw.Reddit(
                 client_id=args.reddit_id,
                 client_secret=args.reddit_secret,
-                user_agent=user_agents[int(args.process_id)-1],
+                user_agent=user_agents[int(args.process_id) - 1],
             )
-
 
             auth = requests.auth.HTTPBasicAuth(args.reddit_id, args.reddit_secret)
             data = {
@@ -123,7 +123,7 @@ try:
                 "username": REDDIT_NAME,
                 "password": REDDIT_PASSWORD,
             }
-            headers = {"User-Agent": user_agents[int(args.process_id)-1]}
+            headers = {"User-Agent": user_agents[int(args.process_id) - 1]}
 
             res = requests.post(
                 "https://www.reddit.com/api/v1/access_token",
@@ -148,12 +148,12 @@ try:
 
         if already_processed_key in already_processed:
             tryed += 1
-            if tryed==10000:
+            if tryed == 10000:
                 time.sleep(10)
-                tryed=0
+                tryed = 0
             continue
 
-        tryed=0
+        tryed = 0
 
         time.sleep(2)
 
@@ -273,4 +273,3 @@ except Exception as e:
     open(error_output_path, "w").write("Error\n")
     logger.info(str(e))
     logger.info("END")
-
