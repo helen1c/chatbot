@@ -8,7 +8,7 @@ DIALOG_FILE_TEMPLATE_PATH = (
 BOTS_CONFIG_PATH = "/storage/rcala/Reddit/bots_config.json"
 
 # safety, comment if sure
-time.sleep(10)
+# time.sleep(10)
 
 dialog_file = open(COMBINED_DIALOG_FILE_PATH, "w")
 
