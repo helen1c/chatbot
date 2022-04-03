@@ -1,67 +1,74 @@
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 TRAITS = ["introverted", "intuitive", "thinking", "perceiving"]
 OPPOSITE_TRAITS = ["extroverted", "sensing", "feeling", "judging"]
 
-def prepare_bot_dialogs(path):
+def dialog_file_decorator(path):
 
-    with open(path,'r') as dialogs_file:
-        dialog_lines = dialogs_file.read().splitlines()
+    with open(path,"r") as file:
 
-    bot_dialog_texts = []
+        for dialog_line in file:
 
-    for dialog_line in dialog_lines:
+            dialog_line = dialog_line.strip()
 
-        dialog_parts = dialog_line.split("\t")
+            dialog_parts = dialog_line.split(" EOS ")
 
-        bot_dialog_text = ""
+            dialog_parts_eos = dialog_parts[:-1] 
 
-        for idx in range(1,len(dialog_parts),2):
+            dialog_parts_tab = dialog_parts[-1].split("\t")
 
-            bot_dialog_text += dialog_parts[idx][4:] + " "
+            dialog_parts = dialog_parts_eos + dialog_parts_tab
 
-        bot_dialog_text = bot_dialog_text.strip()
-        bot_dialog_texts += [bot_dialog_text]
-    
-    return dialog_lines, bot_dialog_texts
+            bot_dialog_text = ""
 
+            for idx in range(1,len(dialog_parts),2):
 
-class MBTIDialogDataset(torch.utils.data.Dataset):
-    def __init__(self, texts):
+                bot_dialog_text += dialog_parts[idx][4:] + " "
+
+            bot_dialog_text = bot_dialog_text.strip()
+
+            data = {
+                "bot_text": bot_dialog_text,
+                "dialog": dialog_line
+            }
+
+            yield data
+
+class MBTIDialogDataset(torch.utils.data.IterableDataset):
+    def __init__(self, path):
         super().__init__()
-        self.texts = texts
+        self.path = path
 
-    def __len__(self):
-        return len(self.texts)
 
-    def __getitem__(self, idx):
+    def __iter__(self):
 
-        item = {"text": self.texts[idx]}
+        dialog_file_iter = dialog_file_decorator(self.path)
 
-        return item
+        return dialog_file_iter
+    
 
 def collate_bert_mbti(samples, tokenizer):
 
-    texts = [sample["text"] for sample in samples]
+    bot_texts = [sample["bot_text"] for sample in samples]
+    dialogs = [sample['dialog'] for sample in samples]
 
     inputs = tokenizer(
-        text=texts,
+        text=bot_texts,
         return_tensors="pt",
         padding=True,
         truncation=True,
         max_length=512,
     )
 
-    return texts, inputs
+    return dialogs, bot_texts, inputs
 
 def prepare_mbti_dialogs(path, batch_size, tokenizer):
 
-    dialog_lines, bot_dialog_texts = prepare_bot_dialogs(path)
+    dataset = MBTIDialogDataset(path)
 
     collate_fun = lambda samples: collate_bert_mbti(samples, tokenizer=tokenizer)
-
-    dataset = MBTIDialogDataset(bot_dialog_texts)
 
     dataloader = DataLoader(
         dataset,
@@ -69,4 +76,4 @@ def prepare_mbti_dialogs(path, batch_size, tokenizer):
         collate_fn=collate_fun,
     )
 
-    return dialog_lines, dataloader
+    return dataloader

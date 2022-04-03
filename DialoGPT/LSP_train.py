@@ -30,7 +30,7 @@ from data_loader import BucketingDataLoader, DynamicBatchingLoader, DistributedB
 
 from gpt2_training.distributed import all_reduce_and_rescale_tensors, all_gather_list
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -90,7 +90,27 @@ parser.add_argument('--config', help='JSON config file')
 
 
 # do normal parsing
-args = parser.parse_args("--model_name_or_path /home/rcala/chatbot/DialoGPT/models/small --init_checkpoint /home/rcala/chatbot/DialoGPT/models/small/pytorch_model.bin --train_input_file /home/rcala/chatbot/DialoGPT/data/train.128len.db --eval_input_file ./data/dummy_data.tsv --output_dir /home/rcala/chatbot/DialoGPT/models/output_model --seed 42 --max_seq_length 128 --train_batch_size 8 --gradient_accumulation_steps 1 --eval_batch_size 16 --learning_rate 1e-5 --num_optim_steps 10000 --valid_step 5000 --warmup_steps 4000 --normalize_data true --fp16 false --lr_schedule noam --loss_scale 0.0 --no_token_id true --pbar true".split())
+args = parser.parse_args("\
+     --model_name_or_path /home/rcala/chatbot/DialoGPT/models/small\
+     --init_checkpoint /home/rcala/chatbot/DialoGPT/models/small/pytorch_model.bin\
+     --train_input_file /home/rcala/chatbot/DialoGPT/data/train.128len.db\
+     --eval_input_file ./data/dummy_data.tsv\
+     --output_dir /home/rcala/chatbot/DialoGPT/models/output_model\
+     --seed 42\
+     --max_seq_length 128\
+     --train_batch_size 8\
+     --gradient_accumulation_steps 1\
+     --eval_batch_size 16\
+     --learning_rate 1e-5\
+     --num_optim_steps 10000\
+     --valid_step 5000\
+     --warmup_steps 4000\
+     --normalize_data true\
+     --fp16 false\
+     --lr_schedule noam\
+     --loss_scale 0.0\
+     --no_token_id true\
+     --pbar true".split())
 
 if args.config is not None:
     # override argparse defaults by config JSON

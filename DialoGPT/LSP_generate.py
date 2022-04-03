@@ -7,7 +7,6 @@ import argparse
 
 from lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config
 from gpt2_training.train_utils import load_model, boolean_string
-from transformers import AutoModelForCausalLM
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 

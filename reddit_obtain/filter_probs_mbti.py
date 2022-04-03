@@ -1,36 +1,53 @@
 import csv
-import pandas as pd
 from reddit_mbti import TRAITS, OPPOSITE_TRAITS
+from tqdm import tqdm
 
 CURR_TRAIT = 0
 OPPOSITE_TRAIT = False
+
 PROBS_PATH = (
-    "reddit_obtain/Reddit/mbti_probs/reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.csv"
+    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.csv"
 )
+
+opposite_trait_threshold = [0.1, 0.142, 0.229, 0.318]
+trait_threshold = [0.9, 0.947, 0.769, 0.767]
+
+
 if OPPOSITE_TRAIT:
     FILTERED_PATH= (
-        "reddit_obtain/Reddit/mbti_filtered/reddit_dialogs_"+OPPOSITE_TRAITS[CURR_TRAIT]+"_filtered.tsv"
+        "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+OPPOSITE_TRAITS[CURR_TRAIT]+"_filtered_"+str(opposite_trait_threshold[CURR_TRAIT])+".csv"
     )
 else:
     FILTERED_PATH= (
-        "reddit_obtain/Reddit/mbti_filtered/reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_filtered.tsv"
+        "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_filtered_"+str(trait_threshold[CURR_TRAIT])+".csv"
     ) 
 
-opposite_trait_threshold = [0.217, 0.142, 0.229, 0.318]
-trait_threshold = [0.736, 0.947, 0.769, 0.767]
+with open(PROBS_PATH,"r") as probs_file:
 
-probs_items = pd.read_csv(PROBS_PATH)
-dialogs = list(probs_items["dialog"])
-probs = list(probs_items[TRAITS[CURR_TRAIT]])
+    probs_file.readline()
 
-if OPPOSITE_TRAIT:
-    filtered_items = [item for item in zip(dialogs, probs) if item[1] < opposite_trait_threshold[CURR_TRAIT]]
-else:
-    filtered_items = [item for item in zip(dialogs, probs) if item[1] > trait_threshold[CURR_TRAIT]]
+    csv_probs = csv.reader(probs_file)
+    num_lines = 0
 
-print("All examples: " + str(len(dialogs)))
-print("Left examples: " + str(len(filtered_items)))
+    with open(FILTERED_PATH,"w") as filtered_file:
 
-with open(FILTERED_PATH, "w") as f:
-    for item in filtered_items:
-        f.write(item[0]+"\n")
+        filtered_file.write("dialog,"+TRAITS[CURR_TRAIT]+"\n")
+
+        csv_filtered = csv.writer(filtered_file)
+        num_filtered_lines = 0
+
+        for row in tqdm(csv_probs):
+
+            num_lines += 1
+
+            if OPPOSITE_TRAIT:
+                if float(row[1]) < opposite_trait_threshold[CURR_TRAIT]:
+                    num_filtered_lines += 1
+                    csv_filtered.writerow(row)
+            else:
+                if float(row[1]) > trait_threshold[CURR_TRAIT]:
+                    num_filtered_lines += 1
+                    csv_filtered.writerow(row)
+            
+print("All examples: " + str(num_lines))
+print("Left examples: " + str(num_filtered_lines))

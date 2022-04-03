@@ -9,26 +9,22 @@ from transformers import (
     BertConfig,
     BertForSequenceClassification,
     BertTokenizer,
-    set_seed,
 )
 from reddit_mbti import TRAITS
 from tqdm import tqdm
 
 CURR_TRAIT = 0
 PATH_DATASET = (
-    "reddit_obtain/Reddit/reddit_dialogs.tsv"
+    "/mnt/rcala/dialog_files/preprocessed_reddit_dialogs.tsv"
 )
 PROBS_PATH = (
-    "reddit_obtain/Reddit/mbti_probs/reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.tsv"
+    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.csv"
 )
 BERT_LOAD_PATH = (
-    "/home/rcala/PromptMBTI_Masters/models/" + "bert" + "_" + TRAITS[CURR_TRAIT] + "_classic"
-)
-BERT_LOAD_PATH = (
-    "/home/rcala/PromptMBTI_Masters/models/" + "General_TinyBERT_4L_312D/"
+    "/mnt/rcala/filter_models/" + "bert" + "_" + TRAITS[CURR_TRAIT] + "_classic_1e-5"
 )
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 if torch.cuda.is_available():
     dev = torch.device("cuda:0")
     print("Running on the GPU")
@@ -37,7 +33,6 @@ else:
     print("Running on the CPU")
 
 torch.manual_seed(123)
-set_seed(123)
 np.random.seed(123)
 random.seed(123)
 
@@ -51,29 +46,28 @@ model.to(dev)
 
 batch_size = 16
 
-dialogs, dataloader = prepare_mbti_dialogs(
+dataloader = prepare_mbti_dialogs(
     PATH_DATASET, batch_size, tokenizer
 )
 
 model.eval()
 
-
-total_probs = []
 tqdm_loader = tqdm(dataloader)
 
 with torch.no_grad():
-    for texts, inputs in tqdm_loader:
 
-        inputs = {k: v.type(torch.long).to(dev) for k, v in inputs.items()}
+    with open(PROBS_PATH, "w") as f:
 
-        prediction = model(**inputs)[:1][0]
+        f.write("dialog," + TRAITS[CURR_TRAIT] + "\n")
+        writer = csv.writer(f)
 
-        total_probs += F.softmax(prediction, dim=1)[:, 1].tolist()
+        for dialogs, bot_texts, inputs in tqdm_loader:
 
-final_items = zip(dialogs, total_probs)
+            inputs = {k: v.type(torch.long).to(dev) for k, v in inputs.items()}
 
-with open(PROBS_PATH, "w") as f:
-    writer = csv.writer(f)
-    f.write("dialog," + TRAITS[CURR_TRAIT] + "\n")
-    writer.writerows(final_items)
+            prediction = model(**inputs)[:1][0]
+
+            probs = F.softmax(prediction, dim=1)[:, 1].tolist()
+
+            writer.writerows(zip(dialogs,probs))
 

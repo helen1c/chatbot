@@ -5,13 +5,13 @@ import sys
 
 # url_re = "https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
 url_re = "https://|http://"
-write_to_file = False
+write_to_file = True
 
 parser = ArgumentParser()
-parser.add_argument("--data_path", default="data/train_reddit_full_raw.tsv")
-parser.add_argument("--output_folder", default="data/outputs")
-parser.add_argument("--preprocessed_file_name", default="preprocessed_reddit.tsv")
-parser.add_argument("--blacklist_path", default="data/words_blacklist_base.txt")
+parser.add_argument("--data_path", default="/mnt/rcala/dialog_files/reddit_dialogs.tsv")
+parser.add_argument("--output_folder", default="/mnt/rcala/dialog_files/")
+parser.add_argument("--preprocessed_file_name", default="preprocessed_reddit_dialogs.tsv")
+parser.add_argument("--blacklist_path", default="/home/rcala/chatbot/reddit_obtain/prepro_files/words_blacklist_base.txt")
 args = parser.parse_args()
 
 if not os.path.exists(args.output_folder):
@@ -89,7 +89,6 @@ for dialog in tqdm(data):
             .replace("w/o", "without")
             .replace("w/", "with")
         )
-        instance = instance.replace("EOS", "")
         final_dialogs.append(instance)
     else:
         out[i] += 1
@@ -98,10 +97,9 @@ if write_to_file:
     open(os.path.join(args.output_folder, args.preprocessed_file_name), "w").writelines(
         final_dialogs
     )
-else:
-    print(f"NUMBER OF DIALOGS BEFORE PREPROCESSING: {len(data)}")
-    print(f"NUMBER OF DIALOGS AFTER PREPROCESSING: {len(final_dialogs)}")
-    print(f"REMOVED DIALOGS: {len(data) - len(final_dialogs)}")
-    print(f"REMOVAL PER CATEGORY:")
-    for k in out.keys():
-        print(f"Removed: {translations[k]}={out[k]}")
+print(f"NUMBER OF DIALOGS BEFORE PREPROCESSING: {len(data)}")
+print(f"NUMBER OF DIALOGS AFTER PREPROCESSING: {len(final_dialogs)}")
+print(f"REMOVED DIALOGS: {len(data) - len(final_dialogs)}")
+print(f"REMOVAL PER CATEGORY:")
+for k in out.keys():
+    print(f"Removed: {translations[k]}={out[k]}")
