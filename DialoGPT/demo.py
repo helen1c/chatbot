@@ -16,8 +16,8 @@ import subprocess as sp
 
 PROJECT_FOLDER = os.path.dirname(os.path.realpath(__file__))
 PYTHON_EXE = 'python'
-MODEL_FOLDER = os.path.join(PROJECT_FOLDER, 'models')
-DATA_FOLDER = os.path.join(PROJECT_FOLDER, 'data')
+MODEL_FOLDER = "/mnt/rcala/dialogpt/models"
+DATA_FOLDER = "/mnt/rcala/dialogpt/data"
 
 print(f'PROJECT_FOLDER = {PROJECT_FOLDER}')
 
@@ -52,7 +52,7 @@ download_model = partial(download_model_folder, DATA_FOLDER=MODEL_FOLDER)
 # model size:  could be one of 'small' (GPT2 with 117M), 'medium'(345M) or 'large' (1542M)
 # dataset: one of 'multiref' or 'dstc'
 # from_scratch: True : load model trained from scratch or False: load model trained from fine-tuning the GPT-2
-target_folder = download_model(model_size='small', dataset='multiref', from_scratch=False)
+target_folder = download_model(model_size='medium', dataset='multiref', from_scratch=False)
 logger.info('Done!\n')
 
 

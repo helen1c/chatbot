@@ -22,15 +22,15 @@ from os.path import join
 from torch.distributed import get_rank, get_world_size
 
 from lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, Adam
-from gpt2_training.train_utils import load_model, boolean_string, set_lr, get_eval_list_same_length
+from gpt2_training.train_utils import load_model, boolean_string, set_lr, get_lr, get_eval_list_same_length
 from gpt2_training.eval_utils import eval_model_loss
 
 from data_loader import BucketingDataLoader, DynamicBatchingLoader, DistributedBucketingDataLoader
-
+from tensorboardX import SummaryWriter
 
 from gpt2_training.distributed import all_reduce_and_rescale_tensors, all_gather_list
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -75,13 +75,14 @@ parser.add_argument("--warmup_steps", type=int, default=16000)
 parser.add_argument("--normalize_data", type=boolean_string, default=True)
 parser.add_argument("--fp16", type=boolean_string, default=False)
 parser.add_argument("--lr_schedule", type=str,
-                    choices=['noam', 'noamwd', 'BERT', 'None'], default='noam')
+                    choices=['noam', 'noamwd', 'BERT', 'None','linear'], default='noam')
 parser.add_argument("--loss_scale", type=float, default=0)
 parser.add_argument("--no_token_id", type=boolean_string, default=True)
 
 parser.add_argument("--output_dir", type=str)
 parser.add_argument("--log_dir", type=str)
 parser.add_argument('--pbar', type=boolean_string, default=True, help='turn on progress bar')
+parser.add_argument("--epochs", type=int, default=3)
 
 # distributed
 parser.add_argument('--local_rank', type=int, default=-1,
@@ -90,7 +91,28 @@ parser.add_argument('--config', help='JSON config file')
 
 
 # do normal parsing
-args = parser.parse_args("--model_name_or_path /home/rcala/DialoGPT/models/small --init_checkpoint /home/rcala/DialoGPT/models/small/pytorch_model.bin --train_input_file /home/rcala/DialoGPT/data/train.128len.db --eval_input_file ./data/dummy_data.tsv --output_dir /home/rcala/DialoGPT/models/output_model --seed 42 --max_seq_length 128 --train_batch_size 512 --gradient_accumulation_steps 8 --eval_batch_size 64 --learning_rate 1e-5 --num_optim_steps 10000 --valid_step 5000 --warmup_steps 4000 --normalize_data true --fp16 false --lr_schedule noam --loss_scale 0.0 --no_token_id true --pbar true".split())
+args = parser.parse_args("\
+     --model_name_or_path /mnt/rcala/dialogpt/models/medium\
+     --init_checkpoint /mnt/rcala/dialogpt/models/medium/medium_ft.pkl\
+     --train_input_file /mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.7785_train.128len.db\
+     --eval_input_file /mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.7785_eval.tsv\
+     --output_dir /mnt/rcala/dialogpt/models/output_models\
+     --seed 123\
+     --max_seq_length 128\
+     --train_batch_size 4\
+     --gradient_accumulation_steps 1\
+     --eval_batch_size 16\
+     --learning_rate 1e-5\
+     --num_optim_steps -1\
+     --valid_step -1\
+     --epochs 3\
+     --warmup_proportion 0.02\
+     --normalize_data true\
+     --fp16 false\
+     --lr_schedule linear\
+     --loss_scale 0.0\
+     --no_token_id true\
+     --pbar true".split())
 
 if args.config is not None:
     # override argparse defaults by config JSON
@@ -163,6 +185,8 @@ args_dict = vars(args)
 for a in args_dict:
     logger.info('%-28s  %s' % (a, args_dict[a]))
 
+t_writer = SummaryWriter(os.path.join(output_dir, "train_tensorboard"), flush_secs=5)
+v_writer = SummaryWriter(os.path.join(output_dir, "val_tensorboard"), flush_secs=5)
 
 #########################################################################
 # Prepare Data Set
@@ -189,6 +213,12 @@ eval_dataloader_loss = DynamicBatchingLoader(
 eval_dataloader_gen = get_eval_list_same_length(
     args.eval_input_file, enc, args.eval_batch_size, True)
 
+with open(args.train_input_file+"/meta.json","r") as meta_file:
+    train_meta = json.load(meta_file)
+
+if args.num_optim_steps == -1:
+    args.num_optim_steps = args.epochs * (train_meta["n_example"] // args.train_batch_size)
+    args.valid_step = (args.num_optim_steps // args.epochs) // 2
 
 #########################################################################
 # Prepare Model and Optimizer
@@ -301,6 +331,10 @@ while True:
             tr_ppl += mean_ppl
         mean_ppl = tr_ppl / nb_tr_steps
 
+        t_writer.add_scalar("loss", mean_loss, global_step)
+        t_writer.add_scalar("ppl", mean_ppl, global_step)
+        t_writer.add_scalar("lr", get_lr(optimizer), global_step)
+
         n_token_total += input_ids.shape[0] * input_ids.shape[1]
         n_token_real += (input_ids != 0).sum().item()
 
@@ -350,10 +384,14 @@ while True:
                         {k: (v.cpu() if v is not None else None)  # save to cpu tensors
                          for k, v in model.state_dict().items()},
                         join(output_dir,
-                             f'GP2-pretrain-step-{global_step}.pkl'))
+                             f'GP2-finetune-step-{global_step}.pkl'))
 
                     eval_loss, eval_ppl = eval_model_loss(
                         model, enc, eval_dataloader_loss, epoch, args)
+
+                    v_writer.add_scalar("loss", eval_loss, global_step)
+                    v_writer.add_scalar("ppl", eval_ppl, global_step)
+
                     # enable generation step evaluation for now
                     # gen_response = eval_model_generation(
                     #     model, enc, eval_dataloader_gen, epoch, args)
