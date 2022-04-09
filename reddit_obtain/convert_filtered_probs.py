@@ -3,11 +3,11 @@ import csv
 #convert for dialogpt
 
 FILTERED_PATH_CSV = (
-    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_introverted_filtered_0.9.csv"
+    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_extroverted_filtered_0.2415.csv"
 )
 
 FILTERED_PATH_TSV = (
-    "/mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.9.tsv"
+    "/mnt/rcala/filtered_files/preprocessed_reddit_dialogs_extroverted_filtered_0.2415.tsv"
 )
 
 with open(FILTERED_PATH_CSV,"r") as filtered_csv_file:

@@ -5,6 +5,7 @@ import os
 import logging
 import torch
 from collections import defaultdict
+from tqdm import tqdm
 
 from env import END_OF_TEXT_TOKEN
 from lsp_model.optim import warmup_linear, noam_decay, noamwd_decay
@@ -170,7 +171,12 @@ def get_eval_list_same_length(input_file, tokenizer, max_batch_size,
         return (input_ids, position_ids, token_type_ids, labels,
                 context_len, response_len)
 
-    features = [featurize(e) for e in examples]
+    features = []
+    for e in tqdm(examples):
+        try:
+            features+=[featurize(e)]
+        except Exception as e:
+            pass
     dataloader_pre = defaultdict(list)
     for f in features:
         dataloader_pre[f.context_len].append(f)
@@ -204,3 +210,7 @@ def set_lr(optimizer, step, schedule, lr,
                                           warmup_proportion)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr_this_step
+
+def get_lr(optimizer):
+    for param_group in optimizer.param_groups:
+        return param_group['lr']

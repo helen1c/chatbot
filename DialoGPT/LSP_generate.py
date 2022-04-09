@@ -1,14 +1,13 @@
 import os
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import argparse
 
 from lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config
 from gpt2_training.train_utils import load_model, boolean_string
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 def top_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
     """ Filter a distribution of logits using top-k, top-p (nucleus) aHnd/or threshold filtering
@@ -48,11 +47,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("--max_history", type=int, default=5)
 parser.add_argument('--model_name_or_path', type=str,
-                    help='pretrained model name or path to local checkpoint')
+                    help='trained model name or path to local chesckpoint')
 parser.add_argument("--init_checkpoint", type=str)
 parser.add_argument("--fp16", type=boolean_string, default=False)
 
-args = parser.parse_args("--model_name_or_path /home/rcala/chatbot/DialoGPT/models/medium --init_checkpoint /home/rcala/chatbot/DialoGPT/models/medium/medium_ft.pkl".split())
+args = parser.parse_args("--model_name_or_path /mnt/rcala/dialogpt/models/medium --init_checkpoint /mnt/rcala/dialogpt/models/medium/medium_ft.pkl".split())
 
 np.random.seed(args.seed)
 torch.random.manual_seed(args.seed)

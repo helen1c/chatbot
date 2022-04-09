@@ -12,13 +12,14 @@ from transformers import (
 )
 from reddit_mbti import TRAITS
 from tqdm import tqdm
+import time
 
 CURR_TRAIT = 0
 PATH_DATASET = (
     "/mnt/rcala/dialog_files/preprocessed_reddit_dialogs.tsv"
 )
 PROBS_PATH = (
-    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.csv"
+    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs_.csv"
 )
 BERT_LOAD_PATH = (
     "/mnt/rcala/filter_models/" + "bert" + "_" + TRAITS[CURR_TRAIT] + "_classic_1e-5"
@@ -53,6 +54,8 @@ dataloader = prepare_mbti_dialogs(
 model.eval()
 
 tqdm_loader = tqdm(dataloader)
+
+time.sleep(60)
 
 with torch.no_grad():
 

@@ -16,8 +16,8 @@ import subprocess as sp
 
 PROJECT_FOLDER = os.path.dirname(os.path.realpath(__file__))
 PYTHON_EXE = 'python'
-MODEL_FOLDER = os.path.join(PROJECT_FOLDER, 'models')
-DATA_FOLDER = os.path.join(PROJECT_FOLDER, 'data')
+MODEL_FOLDER = "/mnt/rcala/dialogpt/models"
+DATA_FOLDER = "/mnt/rcala/dialogpt/data"
 
 print(f'PROJECT_FOLDER = {PROJECT_FOLDER}')
 
