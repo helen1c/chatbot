@@ -107,7 +107,7 @@ while True:
         prev_conv += eos
 
         past=None
-        if len(prev_conv)>args.max_seq_len+256:
+        if len(prev_conv)>args.max_seq_len:
             n = len(prev_conv) // args.max_seq_len
             for i in range(n):
                 prev_input = torch.LongTensor(prev_conv[i*args.max_seq_len:(i+1)*args.max_seq_len]).unsqueeze(0).to(args.device)
