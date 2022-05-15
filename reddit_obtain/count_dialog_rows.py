@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 
-DIALOGS_PATH = "/storage/rcala/Reddit/dialogs"
+DIALOGS_PATH = "/mnt/rcala/dialog_files/first_iteration/dialogs"
 
 dataset_paths = []
 for (dirpath, dirnames, filenames) in os.walk(DIALOGS_PATH):

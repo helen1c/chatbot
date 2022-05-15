@@ -14,15 +14,15 @@ from reddit_mbti import TRAITS
 from tqdm import tqdm
 import time
 
-CURR_TRAIT = 0
+CURR_TRAIT = 2
 PATH_DATASET = (
-    "/mnt/rcala/dialog_files/preprocessed_reddit_dialogs.tsv"
+    "/mnt/rcala/dialog_files/first_iteration/preprocessed_reddit_dialogs.tsv"
 )
 PROBS_PATH = (
-    "/mnt/rcala/mbti_probs/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs_.csv"
+    "/mnt/rcala/mbti_probs/first_iteration/preprocessed_reddit_dialogs_"+TRAITS[CURR_TRAIT]+"_probs.csv"
 )
 BERT_LOAD_PATH = (
-    "/mnt/rcala/filter_models/" + "bert" + "_" + TRAITS[CURR_TRAIT] + "_classic_1e-5"
+    "/mnt/rcala/filter_models/" + "bert" + "_" + TRAITS[CURR_TRAIT] + "_classic"
 )
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -55,7 +55,7 @@ model.eval()
 
 tqdm_loader = tqdm(dataloader)
 
-time.sleep(60)
+time.sleep(10)
 
 with torch.no_grad():
 

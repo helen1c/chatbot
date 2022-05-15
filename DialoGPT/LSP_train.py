@@ -94,8 +94,8 @@ parser.add_argument('--config', help='JSON config file')
 args = parser.parse_args("\
      --model_name_or_path /mnt/rcala/dialogpt/models/medium\
      --init_checkpoint /mnt/rcala/dialogpt/models/medium/medium_ft.pkl\
-     --train_input_file /mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.7785_train.128len.db\
-     --eval_input_file /mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.7785_eval.tsv\
+     --train_input_file /mnt/rcala/filtered_files/first_iteration/preprocessed_reddit_dialogs_extroverted_filtered_0.175_train.128len.db\
+     --eval_input_file /mnt/rcala/filtered_files/first_iteration/preprocessed_reddit_dialogs_extroverted_filtered_0.175_eval.tsv\
      --output_dir /mnt/rcala/dialogpt/models/output_models\
      --seed 123\
      --max_seq_length 128\

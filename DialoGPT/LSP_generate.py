@@ -46,12 +46,16 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("--max_history", type=int, default=5)
+parser.add_argument("--sliding_window",type=bool,default=True)
+parser.add_argument("--sliding_window_size",type=int,default=5)
+parser.add_argument("--sampling",type=bool,default=True)
 parser.add_argument('--model_name_or_path', type=str,
                     help='trained model name or path to local chesckpoint')
+parser.add_argument("--max_seq_len", type=int, default=128)
 parser.add_argument("--init_checkpoint", type=str)
 parser.add_argument("--fp16", type=boolean_string, default=False)
 
-args = parser.parse_args("--model_name_or_path /mnt/rcala/dialogpt/models/medium --init_checkpoint /mnt/rcala/dialogpt/models/medium/medium_ft.pkl".split())
+args = parser.parse_args("--model_name_or_path /mnt/rcala/dialogpt/models/medium --init_checkpoint /mnt/rcala/dialogpt/models/output_models/GPT2.1e-05.4.1gpu.2022-04-07011732_introvert_550k_initial/GP2-finetune-step-93068.pkl".split())
 
 np.random.seed(args.seed)
 torch.random.manual_seed(args.seed)
@@ -68,7 +72,6 @@ model = load_model(GPT2LMHeadModel(config), args.init_checkpoint,
 
 eos = [tokenizer.encoder["<|endoftext|>"]]
 
-past = None
 temperature = 0.9
 top_k = -1
 top_p = 0.9
@@ -76,45 +79,81 @@ top_p = 0.9
 model.eval()
 
 prev_input = None
+past_turns = [] 
 turns = 0
 
 while True:
     with torch.no_grad():
         # input and update B's utterance
-        user = input("User:")
+        user = input("User: ")
         
         if user == "quit":
             "stop talking!"
             break
-        
-        user = tokenizer.encode(user)
-        prev_input = user
-        prev_input = torch.LongTensor(prev_input).unsqueeze(0).to(args.device)
-        logits, past = model(input_ids = prev_input, past=past)[:3]
 
-        prev_input = torch.LongTensor([eos]).to(args.device)
+        if user == "reset":
+            past_turns = [] 
+            prev_input = None
+            turns=0
+            continue
+
+        prev_conv = []
+        for conv in past_turns:
+            prev_conv += conv
+            prev_conv += eos
+
+        user = tokenizer.encode(user)
+        prev_conv += user
+        prev_conv += eos
+
+        past=None
+        if len(prev_conv)>args.max_seq_len+256:
+            n = len(prev_conv) // args.max_seq_len
+            for i in range(n):
+                prev_input = torch.LongTensor(prev_conv[i*args.max_seq_len:(i+1)*args.max_seq_len]).unsqueeze(0).to(args.device)
+                logits, past = model(input_ids = prev_input, past=past)[:3]
+            prev_conv = prev_conv[(i+1)*args.max_seq_len:] 
+        
+        prev_input = torch.LongTensor(prev_conv).unsqueeze(0).to(args.device)
+        logits, past = model(input_ids = prev_input, past=past)[:3]
     
         sent = []
-        for i in range(50):
+        for i in range(128):
 
-            logits, past = model(input_ids = prev_input, past=past)[:3]
-            logits = logits[:, -1, :] / temperature
-            logits = top_filtering(logits, top_k=top_k, top_p=top_p)
-
-            probs = torch.softmax(logits, dim=-1)
-
-            prev_input = torch.multinomial(probs, num_samples=1)
-            prev_word = prev_input.item()
+            if args.sampling:
+                logits = logits[:, -1, :] / temperature
+                logits = top_filtering(logits, top_k=top_k, top_p=top_p)
+                probs = torch.softmax(logits, dim=-1)
+                prev_input = torch.multinomial(probs, num_samples=1)
+                prev_word = prev_input.item()
+            else:
+                logits = logits[:, -1, :]
+                prev_word = torch.topk(logits, 1, dim=1).indices.tolist()[0][0]
+                prev_input = torch.LongTensor([prev_word]).unsqueeze(0).to(args.device)
 
             if prev_word == eos[0]:
                 break
             sent.append(prev_word)
 
-        turns+=1
-        
-        print("Bot:", tokenizer.decode(sent))
-        prev_input = torch.LongTensor([eos]).to(args.device)
-        logits, past = model(input_ids = prev_input, past=past)[:3]
+            logits, past = model(input_ids = prev_input, past=past)[:3]
+                
+        bot = tokenizer.decode(sent)
+        print("Bot:", bot)
 
-        if turns % args.max_history==0:
-            past = None
+        turns += 1
+
+        if args.sliding_window:
+            if turns - 1 >= args.sliding_window_size:
+                for i in range(2,len(past_turns),2):
+                    past_turns[i-2] = past_turns[i]
+                    past_turns[i-1] = past_turns[i+1]
+                past_turns[-2] = user
+                past_turns[-1] = sent
+            else:
+                past_turns += [user]
+                past_turns += [sent]
+        else:
+            if args.max_history != - 1 and turns - 1 >= args.max_history and (turns - 1) % args.max_history == 0:
+                past_turns = []
+            past_turns += [user]
+            past_turns += [sent]
