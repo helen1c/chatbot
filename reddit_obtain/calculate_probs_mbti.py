@@ -14,7 +14,7 @@ from reddit_mbti import TRAITS
 from tqdm import tqdm
 import time
 
-CURR_TRAIT = 2
+CURR_TRAIT = 3
 PATH_DATASET = (
     "/mnt/rcala/dialog_files/first_iteration/preprocessed_reddit_dialogs.tsv"
 )
