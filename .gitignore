@@ -167,3 +167,4 @@ cython_debug/
 /reddit_obtain/__pycache__
 /reddit_obtain/Reddit/bots_config.json
 try.py
+/DialoGPT/models
