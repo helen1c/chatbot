@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from .generator import Generator
 from .generator_utils import available_generators
 import random
-
+import uuid
 
 default_args = {
     "max_history": 5,
@@ -17,10 +17,25 @@ default_args = {
     "top_p": 0.9,
 }
 
+
 model_arg_name = "model_name_or_path"
 checkpoint_arg_name = "init_checkpoint"
 
-generator_dct = {"generator": None}
+generator_dct = {}
+
+
+class GetAvailableModelsView(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        available_models = []
+        for key in available_generators.keys():
+            available_models.append(
+                {"model_id": key, "model_name": available_generators[key]["model_name"]}
+            )
+
+        return Response({"available_models": available_models}, 200)
 
 
 class GenerateDialogView(APIView):
@@ -33,12 +48,19 @@ class GenerateDialogView(APIView):
         if not data:
             return Response({"message": "data not found, missing user prompt"}, 404)
 
-        if generator_dct["generator"] is None:
-            return Response({"message": "model is not loaded"}, 404)
+        specified_uuid = data["specified_uuid"]
+        if specified_uuid is None or generator_dct.get(specified_uuid) is None:
+            return Response(
+                {
+                    "message": "It seems that your model is not initialized. Please go back and choose model again."
+                },
+                404,
+            )
+
+        print(generator_dct.keys())
 
         user_input = data["user"]
-
-        bot_generated = generator_dct["generator"].generate(user_input)
+        bot_generated = generator_dct[specified_uuid].generate(user_input)
 
         return Response({"bot_prompt": f"{bot_generated}"}, 200)
 
@@ -71,8 +93,17 @@ class ChooseModelView(APIView):
         default_args[checkpoint_arg_name] = personality_dict[checkpoint_arg_name]
         default_args["seed"] = r_seed
 
-        generator_dct["generator"] = Generator(default_args)
+        specified_uuid_ex = data.get("specified_uuid")
+
+        if (
+            specified_uuid_ex is not None
+            and generator_dct.get(specified_uuid_ex) is not None
+        ):
+            specified_uuid = specified_uuid_ex
+        else:
+            specified_uuid = str(uuid.uuid4())
+
+        generator_dct[specified_uuid] = Generator(default_args)
 
         print("Model successfully loaded.")
-
-        return Response(200)
+        return Response({"specified_uuid": specified_uuid}, 200)

@@ -1,16 +1,66 @@
 import torch
 import torch.nn.functional as F
+from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer
+import os
+from .gpt2_training.train_utils import load_model
 
 available_generators = {
-    "introvert": {
+    0: {
+        "model_id": 0,
+        "model_name": "Introvert",
         "model_name_or_path": "DialoGPT\models\medium\medium",
-        "init_checkpoint": "DialoGPT\models\GPT2.1e-05.4.1gpu.2022-04-30115722_introverted_550k_structure\GP2-finetune-step-372258.pkl",
+        "init_checkpoint": "DialoGPT\models\checkpoints\introvert\introverted_GP2-finetune-step-253076.pkl",
     },
-    "extrovert": {
+    1: {
+        "model_id": 1,
+        "model_name": "Extrovert",
         "model_name_or_path": "DialoGPT\models\medium\medium",
-        "init_checkpoint": "DialoGPT\models\GPT2.1e-05.4.1gpu.2022-04-30115722_introverted_550k_structure\GP2-finetune-step-372258.pkl",
+        "init_checkpoint": "DialoGPT\models\checkpoints\extrovert\extroverted_GP2-finetune-step-206382.pkl",
+    },
+    2: {
+        "model_id": 2,
+        "model_name": "Intuitive",
+        "model_name_or_path": "DialoGPT\models\medium\medium",
+        "init_checkpoint": "DialoGPT\models\checkpoints\intuitive\intuitive_GP2-finetune-step-322030.pkl",
     },
 }
+
+
+def load_generator_models(args, num_of_mod=None):
+
+    if num_of_mod is None:
+        num_of_mod = len(available_generators.keys())
+
+    models = {}
+
+    loaded = 0
+    keys = available_generators.keys()
+    for key in keys:
+        current_dict = {}
+        current_entry = available_generators[key]
+        current_dict["model_id"] = current_entry["model_id"]
+        current_dict["model_name"] = current_entry["model_name"]
+        tokenizer = GPT2Tokenizer.from_pretrained(current_entry["model_name_or_path"])
+        config = GPT2Config.from_json_file(
+            os.path.join(current_entry["model_name_or_path"], "config.json")
+        )
+        model = load_model(
+            GPT2LMHeadModel(config),
+            current_entry["init_checkpoint"],
+            args,
+            verbose=True,
+        )
+
+        current_dict["model"] = model
+        current_dict["tokenizer"] = tokenizer
+        current_dict["config"] = config
+
+        models[key] = current_dict
+        loaded += 1
+        if loaded > num_of_mod:
+            break
+
+    return models
 
 
 def top_filtering(logits, top_k=0, top_p=0.0, filter_value=-float("Inf")):

@@ -23,13 +23,10 @@ class Generator:
         args["device"] = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         args["n_gpu"] = torch.cuda.device_count()
 
-        self.tokenizer = GPT2Tokenizer.from_pretrained(args["model_name_or_path"])
-        self.config = GPT2Config.from_json_file(
-            os.path.join(args["model_name_or_path"], "config.json")
-        )
-        self.model = load_model(
-            GPT2LMHeadModel(self.config), args["init_checkpoint"], args, verbose=True
-        )
+        self.tokenizer = args["tokenizer"]
+        self.config = args["config"]
+        self.model = args["model"]
+
         self.eos = [self.tokenizer.encoder["<|endoftext|>"]]
 
         self.temperature = (
@@ -105,7 +102,6 @@ class Generator:
                 logits, past = self.model(input_ids=self.prev_input, past=past)[:3]
 
             bot = self.tokenizer.decode(sent)
-            print("Bot:", bot)
 
             self.turns += 1
 

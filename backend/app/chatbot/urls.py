@@ -11,6 +11,7 @@ urlpatterns = [
     # path('', include(router.urls)),
     path("generate_dialog/", views.GenerateDialogView.as_view()),
     path("choose_model/", views.ChooseModelView.as_view()),
+    path("get_available_models/", views.GetAvailableModelsView.as_view())
     # path('auth/', views.CustomAuthToken.as_view()),
     # path('getuser/', views.GetUserApiView.as_view(), name='getUserByToken')
 ]
