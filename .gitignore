@@ -161,7 +161,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-
+/frontend/node_modules
 
 /reddit_obtain/Reddit/
 /reddit_obtain/__pycache__

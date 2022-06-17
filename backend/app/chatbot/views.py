@@ -23,7 +23,7 @@ default_args = {
 model_arg_name = "model_name_or_path"
 checkpoint_arg_name = "init_checkpoint"
 
-available_models = load_generator_models(default_args, 2)
+available_models = load_generator_models(default_args, 3)
 
 generator_dct = {}
 
@@ -34,11 +34,16 @@ class GetAvailableModelsView(APIView):
 
     def get(self, request, *args, **kwargs):
         available_models = []
+        loaded = 0
         for key in available_generators.keys():
             available_models.append(
                 {"model_id": key, "model_name": available_generators[key]["model_name"]}
             )
+            loaded += 1
+            if loaded >= 3:
+                break
 
+        print(available_models)
         return Response({"available_models": available_models}, 200)
 
 
@@ -79,19 +84,20 @@ class ChooseModelView(APIView):
         if not data:
             return Response({"message": "data not found, missing user prompt"}, 404)
 
+        print(data)
         bot_personality_id = data["personality"]
 
-        if not bot_personality_id:
+        if bot_personality_id is None:
             return Response({"message": f"personality field must be given"}, 404)
 
         personality_dict = available_models[bot_personality_id]
 
-        if not personality_dict:
+        if personality_dict is None:
             return Response(
                 {"message": f"personality: {bot_personality_id} does not exist"}, 404
             )
 
-        r_seed = random.randint(1, 2 * 20)
+        r_seed = random.randint(1, 2 ** 25)
 
         # default_args[model_arg_name] = personality_dict[model_arg_name]
         # default_args[checkpoint_arg_name] = personality_dict[checkpoint_arg_name]

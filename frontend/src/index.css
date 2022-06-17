@@ -1,0 +1,17 @@
+body {
+    margin: 0;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1f746d;
+    border-radius: 50px;
+}
+
+@keyframes beat{
+    to { transform: scale(1.5); }
+}
