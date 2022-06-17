@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .generator import Generator
-from .generator_utils import available_generators
+from .generator_utils import available_generators, load_generator_models
 import random
 import uuid
 
@@ -15,11 +15,15 @@ default_args = {
     "temperature": 0.9,
     "top_k": -1,
     "top_p": 0.9,
+    "device": "cpu",
+    "n_gpu": 0,
 }
 
 
 model_arg_name = "model_name_or_path"
 checkpoint_arg_name = "init_checkpoint"
+
+available_models = load_generator_models(default_args, 2)
 
 generator_dct = {}
 
@@ -75,22 +79,22 @@ class ChooseModelView(APIView):
         if not data:
             return Response({"message": "data not found, missing user prompt"}, 404)
 
-        bot_personality = data["personality"]
+        bot_personality_id = data["personality"]
 
-        if not bot_personality:
+        if not bot_personality_id:
             return Response({"message": f"personality field must be given"}, 404)
 
-        personality_dict = available_generators[bot_personality]
+        personality_dict = available_models[bot_personality_id]
 
         if not personality_dict:
             return Response(
-                {"message": f"personality: {bot_personality} does not exist"}, 404
+                {"message": f"personality: {bot_personality_id} does not exist"}, 404
             )
 
         r_seed = random.randint(1, 2 * 20)
 
-        default_args[model_arg_name] = personality_dict[model_arg_name]
-        default_args[checkpoint_arg_name] = personality_dict[checkpoint_arg_name]
+        # default_args[model_arg_name] = personality_dict[model_arg_name]
+        # default_args[checkpoint_arg_name] = personality_dict[checkpoint_arg_name]
         default_args["seed"] = r_seed
 
         specified_uuid_ex = data.get("specified_uuid")
@@ -103,7 +107,7 @@ class ChooseModelView(APIView):
         else:
             specified_uuid = str(uuid.uuid4())
 
-        generator_dct[specified_uuid] = Generator(default_args)
+        generator_dct[specified_uuid] = Generator(personality_dict, default_args)
 
-        print("Model successfully loaded.")
+        print("Generator successfully created.")
         return Response({"specified_uuid": specified_uuid}, 200)

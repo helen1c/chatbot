@@ -3,7 +3,6 @@ import numpy as np
 import torch
 
 
-from .lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config
 from .gpt2_training.train_utils import load_model, boolean_string
 from .generator_utils import top_filtering
 
@@ -18,14 +17,12 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 class Generator:
-    def __init__(self, args) -> None:
+    def __init__(self, model_spec_dictionary, args) -> None:
         seed_all(args["seed"])
-        args["device"] = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        args["n_gpu"] = torch.cuda.device_count()
-
-        self.tokenizer = args["tokenizer"]
-        self.config = args["config"]
-        self.model = args["model"]
+        args["device"] = args["device"]
+        self.tokenizer = model_spec_dictionary["tokenizer"]
+        self.config = model_spec_dictionary["config"]
+        self.model = model_spec_dictionary["model"]
 
         self.eos = [self.tokenizer.encoder["<|endoftext|>"]]
 

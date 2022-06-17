@@ -1,27 +1,33 @@
 import torch
 import torch.nn.functional as F
-from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer
+from .lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config
 import os
 from .gpt2_training.train_utils import load_model
 
 available_generators = {
     0: {
         "model_id": 0,
-        "model_name": "Introvert",
-        "model_name_or_path": "DialoGPT\models\medium\medium",
-        "init_checkpoint": "DialoGPT\models\checkpoints\introvert\introverted_GP2-finetune-step-253076.pkl",
-    },
-    1: {
-        "model_id": 1,
         "model_name": "Extrovert",
         "model_name_or_path": "DialoGPT\models\medium\medium",
         "init_checkpoint": "DialoGPT\models\checkpoints\extrovert\extroverted_GP2-finetune-step-206382.pkl",
+    },
+    1: {
+        "model_id": 1,
+        "model_name": "Introvert",
+        "model_name_or_path": "DialoGPT\models\medium\medium",
+        "init_checkpoint": "DialoGPT\models\checkpoints\introvert\introverted_GP2-finetune-step-253076.pkl",
     },
     2: {
         "model_id": 2,
         "model_name": "Intuitive",
         "model_name_or_path": "DialoGPT\models\medium\medium",
         "init_checkpoint": "DialoGPT\models\checkpoints\intuitive\intuitive_GP2-finetune-step-322030.pkl",
+    },
+    3: {
+        "model_id": 3,
+        "model_name": "Feeling",
+        "model_name_or_path": "DialoGPT\models\medium\medium",
+        "init_checkpoint": "DialoGPT\models\checkpoints\feeling\feeling_GP2-finetune-step-194997.pkl",
     },
 }
 
@@ -44,6 +50,9 @@ def load_generator_models(args, num_of_mod=None):
         config = GPT2Config.from_json_file(
             os.path.join(current_entry["model_name_or_path"], "config.json")
         )
+
+        print(f"Loading model: {str(current_dict)}")
+
         model = load_model(
             GPT2LMHeadModel(config),
             current_entry["init_checkpoint"],
@@ -57,7 +66,7 @@ def load_generator_models(args, num_of_mod=None):
 
         models[key] = current_dict
         loaded += 1
-        if loaded > num_of_mod:
+        if loaded >= num_of_mod:
             break
 
     return models
