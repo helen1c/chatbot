@@ -216,6 +216,6 @@ if __name__ == '__main__':
     parser.add_argument('--two_turn', default=False,
                         help='take only the first 2 turns')
 
-    args = parser.parse_args("--corpus /mnt/rcala/filtered_files/first_iteration/preprocessed_reddit_dialogs_extroverted_filtered_0.175_train.tsv".split())
+    args = parser.parse_args("--corpus /mnt/rcala/filtered_files/first_iteration_lang/preprocessed_reddit_dialogs_judging_filtered_0.122_train.tsv".split())
 
     main(args)

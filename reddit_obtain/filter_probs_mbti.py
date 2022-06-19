@@ -2,23 +2,23 @@ import csv
 from reddit_mbti import TRAITS, OPPOSITE_TRAITS
 from tqdm import tqdm
 
-CURR_TRAIT = 0
+CURR_TRAIT = 3
 OPPOSITE_TRAIT = True
 WRITE = True
 
 PROBS_PATH = (
-    "/mnt/rcala/mbti_probs/first_iteration/preprocessed_reddit_dialogs_"
+    "/mnt/rcala/mbti_probs/first_iteration_lang/preprocessed_reddit_dialogs_"
     + TRAITS[CURR_TRAIT]
     + "_probs.csv"
 )
 
-opposite_trait_threshold = [0.1750, 0.142, 0.229, 0.318]
-trait_threshold = [0.8385, 0.947, 0.769, 0.767]
+opposite_trait_threshold = [0.204, 0.017, 0.205, 0.122]
+trait_threshold = [0.815, 0.891, 0.818, 0.893]
 
 
 if OPPOSITE_TRAIT:
     FILTERED_PATH = (
-        "/mnt/rcala/mbti_probs/first_iteration/preprocessed_reddit_dialogs_"
+        "/mnt/rcala/mbti_probs/first_iteration_lang/preprocessed_reddit_dialogs_"
         + OPPOSITE_TRAITS[CURR_TRAIT]
         + "_filtered_"
         + str(opposite_trait_threshold[CURR_TRAIT])
@@ -26,7 +26,7 @@ if OPPOSITE_TRAIT:
     )
 else:
     FILTERED_PATH = (
-        "/mnt/rcala/mbti_probs/first_iteration/preprocessed_reddit_dialogs_"
+        "/mnt/rcala/mbti_probs/first_iteration_lang/preprocessed_reddit_dialogs_"
         + TRAITS[CURR_TRAIT]
         + "_filtered_"
         + str(trait_threshold[CURR_TRAIT])

@@ -1,3 +1,4 @@
 {
-    "jupyter.debugJustMyCode": false
+    "jupyter.debugJustMyCode": false,
+    "python.pythonPath": "/mnt/rcala/mbti/bin/python"
 }

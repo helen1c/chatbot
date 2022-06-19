@@ -18,7 +18,7 @@ parser.add_argument("--init_checkpoint", type=str)
 parser.add_argument("--max_seq_len", type=int, default=512)
 parser.add_argument("--fp16", type=boolean_string, default=False)
 
-args = parser.parse_args("--model_name_or_path /mnt/rcala/dialogpt/models/medium --init_checkpoint /mnt/rcala/dialogpt/models/output_models/GPT2.1e-05.4.1gpu.2022-04-07011732_introvert_550k_initial/GP2-finetune-step-93068.pkl".split())
+args = parser.parse_args("--model_name_or_path /mnt/rcala/dialogpt/models/medium --init_checkpoint /mnt/rcala/dialogpt/models/medium/medium_ft.pkl".split())
 
 np.random.seed(args.seed)
 torch.random.manual_seed(args.seed)
