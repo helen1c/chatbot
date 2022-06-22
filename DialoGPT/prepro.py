@@ -211,11 +211,11 @@ if __name__ == '__main__':
                         help='num of data examples in a storing chunk')
     parser.add_argument('--max_seq_len', type=int, default=128,
                         help='discard data longer than this')
-    parser.add_argument('--reverse', action='store_true',
+    parser.add_argument('--reverse', default=False,
                         help='reverse the src tgt')
-    parser.add_argument('--two_turn', action='store_true',
+    parser.add_argument('--two_turn', default=False,
                         help='take only the first 2 turns')
 
-    args = parser.parse_args()
+    args = parser.parse_args("--corpus /mnt/rcala/filtered_files/first_iteration_lang/preprocessed_reddit_dialogs_judging_filtered_0.122_train.tsv".split())
 
     main(args)

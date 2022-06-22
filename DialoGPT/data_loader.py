@@ -203,7 +203,13 @@ def convert_examples_to_features_dynamic(examples, tokenizer,
                              lm_labels, len(context_id), len(response_id))
 
     # discard None feature
-    features = [f for f in [featurize(ex) for ex in examples] if f is not None]
+    features = []
+    for ex in examples:
+        try:
+            features += [featurize(ex)]
+        except Exception as e:
+            pass
+    features = [f for f in features if f is not None]
     return features
 
 
