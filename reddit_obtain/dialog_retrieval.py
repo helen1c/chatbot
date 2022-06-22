@@ -10,10 +10,10 @@ from praw.models import MoreComments
 import random
 from random import randrange
 
-SUBREDDITS_PATH = "/storage/rcala/Reddit/reddit_subreddits.txt"
-NSFW_SUBREDDITS_PATH = "/storage/rcala/Reddit/nsfw_reddit_subreddits.txt"
+SUBREDDITS_PATH = "/mnt/rcala/dialog_files/first_iteration/reddit_subreddits.txt"
+NSFW_SUBREDDITS_PATH = "/mnt/rcala/dialog_files/first_iteration/nsfw_reddit_subreddits.txt"
 
-USER_AGENTS_PATH = "/storage/rcala/Reddit/user_agent_texts.txt"
+USER_AGENTS_PATH = "/mnt/rcala/dialog_files/first_iteration/user_agent_texts.txt"
 
 DAILY_SECONDS = 86400
 FIRST_EPOCH_TIMESTAMP_2018 = 1514764800
@@ -44,23 +44,23 @@ try:
 
     random.seed(int(args.process_id))
 
-    already_chosen_json_path = "/storage/rcala/Reddit/already_processed/already_processed_process_{}.json".format(
+    already_chosen_json_path = "/mnt/rcala/dialog_files/first_iteration/already_processed/already_processed_process_{}.json".format(
         args.process_id
     )
 
     dialog_output_path = (
-        "/storage/rcala/Reddit/dialogs/reddit_dialogs_process_{}.tsv".format(
+        "/mnt/rcala/dialog_files/first_iteration/dialogs/reddit_dialogs_process_{}.tsv".format(
             args.process_id
         )
     )
 
     error_output_path = (
-        "/storage/rcala/Reddit/error_logs/process_{}_error_log.txt".format(
+        "/mnt/rcala/dialog_files/first_iteration/error_logs/process_{}_error_log.txt".format(
             args.process_id
         )
     )
 
-    logs_output_path = "/storage/rcala/Reddit/logs/process_{}_log.txt".format(
+    logs_output_path = "/mnt/rcala/dialog_files/first_iteration/logs/process_{}_log.txt".format(
         args.process_id
     )
 

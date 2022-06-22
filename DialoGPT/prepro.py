@@ -187,7 +187,7 @@ def main(args):
                     chunk.append(vars(feature))
                     n_example += 1
             except Exception as e:
-                #print('!!! prepro exception !!!', e)
+                print('!!! prepro exception !!!', e)
                 continue
         # save last chunk
         db[f'chunk_{n_chunk}'] = gzip.compress(
@@ -216,6 +216,6 @@ if __name__ == '__main__':
     parser.add_argument('--two_turn', default=False,
                         help='take only the first 2 turns')
 
-    args = parser.parse_args("--corpus /mnt/rcala/filtered_files/preprocessed_reddit_dialogs_introverted_filtered_0.7785_train_small.tsv".split())
+    args = parser.parse_args("--corpus /mnt/rcala/filtered_files/first_iteration/preprocessed_reddit_dialogs_extroverted_filtered_0.175_train.tsv".split())
 
     main(args)
