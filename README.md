@@ -1,4 +1,4 @@
-<h1>Repository for TBD ...</h1>
+<h1>Implementation of conversational models with personality traits</h1>
 
 <h2 style="text-align:center">Dialog example with extroverted model</h2>
 <div style="display:flex;flex-direction:row;width:100%;">
