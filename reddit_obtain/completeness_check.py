@@ -1,8 +1,8 @@
 import json
 
-BOTS_CONFIG_PATH = "/storage/rcala/Reddit/bots_config.json"
-SUBREDDITS_PATH = "/storage/rcala/Reddit/reddit_subreddits.txt"
-NSFW_SUBREDDITS_PATH = "/storage/rcala/Reddit/nsfw_reddit_subreddits.txt"
+BOTS_CONFIG_PATH = "/mnt/rcala/dialog_files/first_iteration/bots_config.json"
+SUBREDDITS_PATH = "/mnt/rcala/dialog_files/first_iteration/reddit_subreddits.txt"
+NSFW_SUBREDDITS_PATH = "/mnt/rcala/dialog_files/first_iteration/nsfw_reddit_subreddits.txt"
 DAILY_SECONDS = 86400
 FIRST_EPOCH_TIMESTAMP_2018 = 1514764800
 LAST_EPOCH_TIMESTAMP_2022 = 1646870400
@@ -13,7 +13,7 @@ NUM_PERIODS = int(
 )
 NUM_BOTS = 350
 ALREADY_PROCESSED_TEMPLATE = (
-    "/storage/rcala/Reddit/already_processed/already_processed_process_{}.json"
+    "/mnt/rcala/dialog_files/first_iteration/already_processed/already_processed_process_{}.json"
 )
 
 bots_file = open(BOTS_CONFIG_PATH, "r")

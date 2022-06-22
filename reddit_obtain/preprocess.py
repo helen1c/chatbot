@@ -45,12 +45,6 @@ data = open(args.data_path, "r")
 def filter_instance(instance, w_blacklist=[], debug=True):
     instance = instance.lower()
 
-    doc = nlp(instance)
-    if doc._.language['language']!="en":
-        return True, 5
-    
-    return (False, -1)
-
     for word in w_blacklist:
         if word in instance:
             if debug:

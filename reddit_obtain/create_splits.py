@@ -3,7 +3,7 @@ import random
 TRAIN_SIZE = 500000
 EVAL_SIZE = 50000
 FILTERED_PATH_TSV = (
-    "/mnt/rcala/filtered_files/first_iteration/preprocessed_reddit_dialogs_extroverted_filtered_0.175.csv"
+    "/mnt/rcala/filtered_files/first_iteration_lang/preprocessed_reddit_dialogs_judging_filtered_0.122.tsv"
 )
 
 random.seed(123)
